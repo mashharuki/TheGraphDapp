@@ -40,6 +40,32 @@ export class GreetingChange__Params {
   }
 }
 
+export class SendMessage extends ethereum.Event {
+  get params(): SendMessage__Params {
+    return new SendMessage__Params(this);
+  }
+}
+
+export class SendMessage__Params {
+  _event: SendMessage;
+
+  constructor(event: SendMessage) {
+    this._event = event;
+  }
+
+  get _from(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get _to(): Address {
+    return this._event.parameters[1].value.toAddress();
+  }
+
+  get message(): string {
+    return this._event.parameters[2].value.toString();
+  }
+}
+
 export class YourContract extends ethereum.SmartContract {
   static bind(address: Address): YourContract {
     return new YourContract("YourContract", address);
@@ -155,6 +181,40 @@ export class ConstructorCall__Outputs {
   _call: ConstructorCall;
 
   constructor(call: ConstructorCall) {
+    this._call = call;
+  }
+}
+
+export class SendMessageCall extends ethereum.Call {
+  get inputs(): SendMessageCall__Inputs {
+    return new SendMessageCall__Inputs(this);
+  }
+
+  get outputs(): SendMessageCall__Outputs {
+    return new SendMessageCall__Outputs(this);
+  }
+}
+
+export class SendMessageCall__Inputs {
+  _call: SendMessageCall;
+
+  constructor(call: SendMessageCall) {
+    this._call = call;
+  }
+
+  get _to(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+
+  get message(): string {
+    return this._call.inputValues[1].value.toString();
+  }
+}
+
+export class SendMessageCall__Outputs {
+  _call: SendMessageCall;
+
+  constructor(call: SendMessageCall) {
     this._call = call;
   }
 }

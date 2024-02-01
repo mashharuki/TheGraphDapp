@@ -1,35 +1,36 @@
-import { BigInt, Address } from "@graphprotocol/graph-ts";
 import {
-  YourContract,
-  GreetingChange,
+  GreetingChange as GreetingChangeEvent,
+  SendMessage as SendMessageEvent
 } from "../generated/YourContract/YourContract";
-import { Greeting, Sender } from "../generated/schema";
+import { GreetingChange, SendMessage } from "../generated/schema";
 
-export function handleGreetingChange(event: GreetingChange): void {
-  let senderString = event.params.greetingSetter.toHexString();
+export function handleGreetingChange(event: GreetingChangeEvent): void {
+  let entity = new GreetingChange(
+    event.transaction.hash.concatI32(event.logIndex.toI32())
+  )
+  entity.greetingSetter = event.params.greetingSetter
+  entity.newGreeting = event.params.newGreeting
+  entity.premium = event.params.premium
+  entity.value = event.params.value
 
-  let sender = Sender.load(senderString);
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
 
-  if (sender === null) {
-    sender = new Sender(senderString);
-    sender.address = event.params.greetingSetter;
-    sender.createdAt = event.block.timestamp;
-    sender.greetingCount = BigInt.fromI32(1);
-  } else {
-    sender.greetingCount = sender.greetingCount.plus(BigInt.fromI32(1));
-  }
+  entity.save()
+}
 
-  let greeting = new Greeting(
-    event.transaction.hash.toHex() + "-" + event.logIndex.toString()
-  );
+export function handleSendMessage(event: SendMessageEvent): void {
+  let entity = new SendMessage(
+    event.transaction.hash.concatI32(event.logIndex.toI32())
+  )
+  entity._from = event.params._from
+  entity._to = event.params._to
+  entity.message = event.params.message
 
-  greeting.greeting = event.params.newGreeting;
-  greeting.sender = senderString;
-  greeting.premium = event.params.premium;
-  greeting.value = event.params.value;
-  greeting.createdAt = event.block.timestamp;
-  greeting.transactionHash = event.transaction.hash.toHex();
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
 
-  greeting.save();
-  sender.save();
+  entity.save()
 }

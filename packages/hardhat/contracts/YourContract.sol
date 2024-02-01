@@ -28,6 +28,9 @@ contract YourContract {
 		uint256 value
 	);
 
+	event SendMessage(address _from, address _to, string message);
+
+
 	// Constructor: Called once on contract deployment
 	// Check packages/hardhat/deploy/00_deploy_your_contract.ts
 	constructor(address _owner) {
@@ -84,4 +87,11 @@ contract YourContract {
 	 * Function that allows the contract to receive ETH
 	 */
 	receive() external payable {}
+
+	/**
+	 * 新たに追加した関数
+	 */
+	function sendMessage(address _to, string calldata message) external {
+    emit SendMessage(msg.sender, _to, message);
+  }
 }
